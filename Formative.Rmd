@@ -1,0 +1,91 @@
+---
+title: "formative"
+author: "Yiran Du"
+date: "2017/10/5"
+output: html_document
+---
+# Setup the enviroment
+```{r setup, include=FALSE}
+setwd("~/Desktop/github/formative-test-1-YiranDuMirabelle11/") 
+# import the dataset into a dataframe
+D1 <- read.csv("HMXPC13_DI_v2_5-14-14.csv")
+# import packages
+library(dplyr)
+library(tidyr)
+
+# ensure the class
+class(D1)
+# get familiar with the dataset
+View(D1)
+head(D1)
+glimpse(D1)
+```
+
+## Questions:
+### 5 
+Accroding to the document on the website, DI means de-identified data because these information containing too much details about a student are concerned about students' privacy. Therefore here the dataset strip the data of details so that it is de-identified.
+
+
+### 6 
+``` {}
+count(D1, course_id == "HarvardX/CS50x/2012" & certified == 1)
+```
+There are 1287 students gaining the certificate in HarvardX CS50x in 2012.
+
+### 7 
+``` {}
+sum(D1$course_id == "HarvardX/CS50x/2012" & D1$final_cc_cname_DI == "Colombia" & D1$start_time_DI == "2012-10-15")
+```
+There are 10 students in Colombia registering for CS50x on Oct 15th, 2012.
+
+### 8
+create D2
+``` {}
+D2 <- filter(D1[c(2,7,12)],final_cc_cname_DI == "Japan")
+```
+If we want only one record per student for a certain date
+``` {}
+D2_unique <- unique(D2)
+```
+
+### 9
+
+Create D3
+First make the data in D3 unique and create a new variable as "done"
+```{}
+D3 <- unique(D2[c(1,3)])
+D3$done <- 1
+```
+Transform D3 from long list into a wide list
+```{}
+D3 <- spread(D3, key = "start_time_DI",value = "done")
+```
+
+### 10
+```{}
+row.names(D3) <- D3$userid_DI
+D3 <- D3[-1]
+```
+
+### 11 Transform it into a matrix
+```{}
+M1 <- as.matrix(D3)
+M1 <- ifelse(is.na(M1),0,1)
+```
+
+### 12 transpose the M1 into M2
+```{}
+M2 <- t(M1)
+```
+
+### 13 to create a matrix
+```{}
+M3 <- M1%*%M2
+```
+The number appearing is the number of days when two students register at the same day. 
+
+# 14
+```{}
+diag(M3) <- NA
+```
+
